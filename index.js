@@ -2,18 +2,21 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = '5933177184:AAHSsi4LYhFEK6x8pm6Avcgld-i9MN43MjM';
 const bot = new TelegramBot(token, {polling: true});
 const teams = new Map()
-const membersCount = 5
+const membersCount = 2
 
 bot.onText(/\/create/, (msg, match) => {
   const chatId = msg.chat.id;
 
-  teams.set(chatId, {
-    needs: membersCount,
-    players: [msg.from],
-  })
-
-  bot.sendMessage(chatId, `Слава Україні!! Відкрився набір в команду, потрібно ${membersCount} гравців, для приєднання відправте команду /join`);
-  bot.sendMessage(chatId, `1/${membersCount} @${msg.from.username} готовий`);
+  if (!teams.has(chatId)) {
+    teams.set(chatId, {
+      needs: membersCount,
+      players: [msg.from],
+    })
+    bot.sendMessage(chatId, `Слава Україні!! Відкрився набір в команду, потрібно ${membersCount} гравців, для приєднання відправте команду /join`);
+    bot.sendMessage(chatId, `1/${membersCount} @${msg.from.username} готовий`);
+  } else {
+    bot.sendMessage(chatId, `набір у команду вже відкритий, для приєднання відправте команду /join`);
+  }
 });
 
 bot.onText(/\/squad/, (msg, match) => {
@@ -43,12 +46,25 @@ bot.onText(/\/remove/, (msg, match) => {
   }
 });
 
+bot.onText(/\/restart/, (msg, match) => {
+  const chatId = msg.chat.id;
+  teams.set(chatId, {
+    needs: membersCount,
+    players: [msg.from],
+  })
+  bot.sendMessage(chatId, `Слава Україні!! Відкрився набір в команду, потрібно ${membersCount} гравців, для приєднання відправте команду /join`);
+  bot.sendMessage(chatId, `1/${membersCount} @${msg.from.username} готовий`);
+
+});
+
 bot.onText(/\/join/, (msg, match) => {
   const chatId = msg.chat.id;
   const team = teams.get(chatId)
   if (!msg.from.is_bot) {
     if (team) {
-      if (team.players.some(player => player.id === msg.from.id)) {
+      if (team.players.length === team.needs) {
+        bot.sendMessage(chatId, `@${msg.from.username} не хочу тебе ображати, але ти зайвий`);
+      } else if (team.players.some(player => player.id === msg.from.id)) {
         bot.sendMessage(chatId, `@${msg.from.username} не зли мене, ти і так вже в команді виродок!! Відправь /squad щоб подивитися склад`);
       } else {
         team.players.push(msg.from)
