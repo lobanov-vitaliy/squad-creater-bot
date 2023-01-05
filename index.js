@@ -52,7 +52,7 @@ bot.onText(/\/join/, (msg, match) => {
         bot.sendMessage(chatId, `@${msg.from.username} не зли мене, ти і так вже в команді виродок!! Відправь /squad щоб подивитися склад`);
       } else {
         team.players.push(msg.from)
-        bot.sendMessage(chatId, `${team.players.length}/${team.needs} @${msg.from.username} готовый`);
+        bot.sendMessage(chatId, `${team.players.length}/${team.needs} @${msg.from.username} готовий`);
       }
     } else {
       bot.sendMessage(chatId, 'Немає відкритого набору до команди, для створення команди напишіть /create');
