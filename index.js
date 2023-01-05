@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = '5933177184:AAHSsi4LYhFEK6x8pm6Avcgld-i9MN43MjM';
 const bot = new TelegramBot(token, {polling: true});
 const teams = new Map()
-const membersCount = 2
+const membersCount = 5
 
 bot.onText(/\/create/, (msg, match) => {
   const chatId = msg.chat.id;
@@ -15,7 +15,7 @@ bot.onText(/\/create/, (msg, match) => {
     bot.sendMessage(chatId, `Слава Україні!! Відкрився набір в команду, потрібно ${membersCount} гравців, для приєднання відправте команду /join`);
     bot.sendMessage(chatId, `1/${membersCount} @${msg.from.username} готовий`);
   } else {
-    bot.sendMessage(chatId, `набір у команду вже відкритий, для приєднання відправте команду /join`);
+    bot.sendMessage(chatId, `Набір вже відкритий, для приєднання відправте /join`);
   }
 });
 
@@ -69,13 +69,13 @@ bot.onText(/\/join/, (msg, match) => {
       } else {
         team.players.push(msg.from)
         bot.sendMessage(chatId, `${team.players.length}/${team.needs} @${msg.from.username} готовий`);
+        if (team.players.length === team.needs) {
+          bot.sendMessage(chatId, `Героям Слава!!! Формування загону зі знищення свинособак готовий, склад команди: ${team.players.map(player => `@${player.username}`).join(' ')}`);
+        }
       }
     } else {
       bot.sendMessage(chatId, 'Немає відкритого набору до команди, для створення команди напишіть /create');
     }
 
-    if (team.players.length === team.needs) {
-      bot.sendMessage(chatId, `Героям Слава!!! Формування загону зі знищення свинособак готовий, склад команди: ${team.players.map(player => `@${player.username}`).join(' ')}`);
-    }
   }
 });
