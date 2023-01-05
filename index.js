@@ -27,6 +27,22 @@ bot.onText(/\/squad/, (msg, match) => {
   }
 });
 
+bot.onText(/\/remove/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const team = teams.get(chatId)
+
+  if (team) {
+    if (team.players.some(player => player.id === msg.from.id)) {
+      team.players = team.players.filter(player => player.id !== msg.from.id)
+      bot.sendMessage(chatId, `@${msg.from.username} більше не наш побратим на цю катку`);
+    } else {
+      bot.sendMessage(chatId, `@${msg.from.username} не зли мене, ти ще навіть не в команді виродок!!`);
+    }
+  } else {
+    bot.sendMessage(chatId, 'Немає відкритого набору до команди, для створення команди напишіть /create');
+  }
+});
+
 bot.onText(/\/join/, (msg, match) => {
   const chatId = msg.chat.id;
   const team = teams.get(chatId)
